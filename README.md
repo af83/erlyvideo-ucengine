@@ -37,16 +37,11 @@ And don't forget to add 'ucengine' in our module list:
 
          # Fetch erlyvideo_ucengine sources
          $ git clone git://github.com/AF83/erlyvideo-ucengine.git
-         $ cd erlyvideo-ucengine/
 
-         # Fetch dependencies (ibrowse)
-         $ git submodule update --init
+         # Fetch ibrowse
+         $ cd ../deps/
+         $ git clone https://github.com/dizzyd/ibrowse.git
 
-         # Build the module and its dependencies
-         $ make
-
-         # Build Erlyvideo
-         $ cd ../../
          $ make
 
          # Update configuration, then run Erlyvideo
