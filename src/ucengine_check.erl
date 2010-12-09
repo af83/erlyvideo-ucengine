@@ -24,11 +24,11 @@
 -module(ucengine_check).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
 
--include("../include/ucengine.hrl").
--include("../include/rtmp_session.hrl").
-%-include("../../../deps/rtmp/include/rtmp.hrl").
-%-include("../../include/rtmp_session.hrl").
--include_lib("rtmp/include/rtmp.hrl").
+-include("ucengine.hrl").
+-include("rtmp_session.hrl").
+
+-include("rtmp.hrl").
+
 -export([connect/2]).
 
 -export([getStreams/2, publish/2]).

@@ -25,7 +25,7 @@
 	 code_change/3,
 	 terminate/2]).
 
--include_lib("../include/ucengine.hrl").
+-include("ucengine.hrl").
 
 -behaviour(gen_server).
 

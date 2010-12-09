@@ -2,8 +2,8 @@
 
 -behaviour(gen_event).
 
--include_lib("../include/ucengine.hrl").
--include_lib("../include/erlyvideo.hrl").
+-include("ucengine.hrl").
+-include("erlyvideo.hrl").
 
 -export([init/1,
 	 handle_event/2,
