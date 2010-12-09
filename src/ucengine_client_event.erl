@@ -2,7 +2,7 @@
 
 -behaviour(gen_event).
 
--include("ucengine.hrl").
+-include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
 -include("erlyvideo.hrl").
 
 -export([init/1,

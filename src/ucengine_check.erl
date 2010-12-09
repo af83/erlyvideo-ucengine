@@ -24,10 +24,10 @@
 -module(ucengine_check).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
 
--include("ucengine.hrl").
--include("rtmp_session.hrl").
+-include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("deps/rtmp/include/rtmp.hrl").
 
--include("rtmp.hrl").
+-include("rtmp_session.hrl").
 
 -export([connect/2]).
 

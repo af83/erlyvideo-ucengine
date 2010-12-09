@@ -1,6 +1,6 @@
 -module(ucengine_ems_event).
 
--include("ucengine.hrl").
+-include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
 -include("erlyvideo.hrl").
 
 -behaviour(gen_event).
