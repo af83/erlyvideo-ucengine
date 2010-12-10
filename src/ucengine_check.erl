@@ -1,6 +1,6 @@
 %%%---------------------------------------------------------------------------------------
 %%% @author     Thierry Bomandouki <thierry.bomandouki@af83.com> [http://erlyvideo.org]
-%%% @copyright  2010 Thierry Bomandouki 
+%%% @copyright  2010 af83
 %%% @doc        erlyvideo custom login for ucengine plugin 
 %%% @reference  See <a href="http://ucengine.org" target="_top">http://ucengine.org</a> for more information
 %%% @end
