@@ -26,7 +26,7 @@ And don't forget to add 'ucengine' in our module list:
 
 ## Dependencies
 
-        - ibrowse (https://github.com/dizzyd/ibrowse)
+        - [ibrowse](https://github.com/dizzyd/ibrowse)
 
 ## Install it from scratch
 
@@ -40,7 +40,7 @@ And don't forget to add 'ucengine' in our module list:
 
          # Fetch ibrowse and build it
          $ cd ../deps/
-         $ git clone https://github.com/dizzyd/ibrowse.git
+         $ git clone https://github.com/cmullaparthi/ibrowse.git
          $ cd ibrowse
          $ make
 
