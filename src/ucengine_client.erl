@@ -15,6 +15,7 @@
 
 	 publish/1,
 
+	 can/4,
 	 can/5,
 
 	 time/0,
@@ -89,6 +90,8 @@ subscribe(Location, Type, Params, Pid) ->
 publish(#uce_event{} = Event) ->
     gen_server:call(?MODULE, {publish, Event}).
 
+can(Uid, Object, Action, Location) ->
+    can(Uid, Object, Action, Location, []).
 can(Uid, Object, Action, Location, Conditions) ->
     gen_server:call(?MODULE, {can, Uid, Object, Action, Location, Conditions}).
 

@@ -24,6 +24,10 @@ And don't forget to add 'ucengine' in our module list:
 
         {modules, [ucengine]}.
 
+And replace *trusted_login* by *ucengine_login* in *rtmp_handlers*, like that:
+
+        {rtmp_handlers, [{auth_users_limit, 200}, ucengine_login, apps_push, apps_streaming, apps_recording]},
+
 ## Dependencies
 
         - [ibrowse](https://github.com/dizzyd/ibrowse)
