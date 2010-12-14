@@ -54,10 +54,10 @@
 -define(AUTH_METHOD_PASSWORD, "password").
 
 -record(state, {host = "localhost",
-		port = 5280,
-		debug = ?QUIET,
-		uid = undefined,
-		sid = undefined}).
+                port = 5280,
+                debug = ?QUIET,
+                uid = undefined,
+                sid = undefined}).
 
 start_link(Host, Port) ->
     ?MODULE:start_link(Host, Port, ?QUIET).
@@ -109,8 +109,8 @@ time() ->
 
 decode_event({_, Event}) ->
     case utils:get(Event,
-		   [id, datetime, from, org, meeting, type, parent, metadata],
-		   [none, none, none, <<"">>, <<"">>, none, <<"">>, {array, []}]) of
+                   [id, datetime, from, org, meeting, type, parent, metadata],
+                   [none, none, none, <<"">>, <<"">>, none, <<"">>, {array, []}]) of
         {error, Reason} ->
             {error, Reason};
         [Id, Datetime, From, Org, Meeting, Type, Parent, {_, Metadata}] ->
@@ -125,55 +125,55 @@ decode_event({_, Event}) ->
 
 receive_events(State, Location, Type, Params, Pid) ->
     LocationStr = case Location of
-		      [] ->
-			  "";
-		      [Org] ->
-			  Org;
-		      [Org,Meeting] ->
-			  Org ++ "/" ++ Meeting
-		  end,
+                      [] ->
+                          "";
+                      [Org] ->
+                          Org;
+                      [Org,Meeting] ->
+                          Org ++ "/" ++ Meeting
+                  end,
     Resp = http_get(State, "/event/" ++ LocationStr,
-		    Params ++ [{"uid", State#state.uid},
-			       {"sid", State#state.sid},
-			       {"type", Type},
-			       {"_async", "lp"}]),
+                    Params ++ [{"uid", State#state.uid},
+                               {"sid", State#state.sid},
+                               {"type", Type},
+                               {"_async", "lp"}]),
     NewParams = case Resp of
-		    {ok, "200", _, JSonResponse} ->
-			{_, [{result, Array}]} = mochijson2:decode(JSonResponse),
-			Events = [decode_event(JSonEvent) || JSonEvent <- Array],
-			case Events of
-			    [] ->
-				Params;
-			    _ ->
-				[ Pid ! {event, Event} || Event <- Events ],
-				LastEvent = lists:last(Events),
-				lists:keyreplace("start", 1, Params,
-						 {"start", integer_to_list(LastEvent#uce_event.datetime + 1)})
-			end;
-		    {error,req_timedout} ->
-			Params;
-		    Error ->
-			ems_log:error(default, "Subscribe: error: ~p", [Error]),
-			timer:sleep(5000),
-			Params
-	       end,
+                    {ok, "200", _, JSonResponse} ->
+                        {_, [{result, Array}]} = mochijson2:decode(JSonResponse),
+                        Events = [decode_event(JSonEvent) || JSonEvent <- Array],
+                        case Events of
+                            [] ->
+                                Params;
+                            _ ->
+                                [ Pid ! {event, Event} || Event <- Events ],
+                                LastEvent = lists:last(Events),
+                                lists:keyreplace("start", 1, Params,
+                                                 {"start", integer_to_list(LastEvent#uce_event.datetime + 1)})
+                        end;
+                    {error,req_timedout} ->
+                        Params;
+                    Error ->
+                        ems_log:error(default, "Subscribe: error: ~p", [Error]),
+                        timer:sleep(5000),
+                        Params
+                end,
     receive_events(State, Location, Type, NewParams, Pid).
 
 handle_call({connect, Uid, Credential, Method}, _From, State) ->
     Resp = http_put(State, "/presence/" ++ Uid, [{"auth", Method},
-						 {"credential", Credential}]),
+                                                 {"credential", Credential}]),
     case Resp of
-	{ok, "201", _, JSONString} ->
-	    {_, [{result, Sid}]} = mochijson2:decode(JSONString),
-	    {reply, {ok, binary_to_list(Sid)},
-	     State#state{uid = Uid, sid = binary_to_list(Sid)}};
-	{ok, _, _, JSONString} ->
-	    {_, [{result, Error}]} = mochijson2:decode(JSONString),
-	    {reply, {error, binary_to_list(Error)}, State};
-	{error, Reason} ->
-	    {reply, {error, Reason}, State};
-	Error ->
-	    {reply, {error, Error}, State}
+        {ok, "201", _, JSONString} ->
+            {_, [{result, Sid}]} = mochijson2:decode(JSONString),
+            {reply, {ok, binary_to_list(Sid)},
+             State#state{uid = Uid, sid = binary_to_list(Sid)}};
+        {ok, _, _, JSONString} ->
+            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+            {reply, {error, binary_to_list(Error)}, State};
+        {error, Reason} ->
+            {reply, {error, Reason}, State};
+        Error ->
+            {reply, {error, Error}, State}
     end;
 
 handle_call({subscribe, _Location, _Type, _Params, _Pid}, _From, #state{uid = Uid, sid = Sid} = State) when Uid == undefined;  Sid == undefined ->
@@ -187,8 +187,8 @@ handle_call({publish, #uce_event{}}, _From, #state{uid = Uid, sid = Sid} = State
     {reply, {error, not_connected}, State};
 
 handle_call({publish, #uce_event{type = Type,
-				 to = To,
-				 metadata=Metadata} = Event}, _From, State) ->
+                                 to = To,
+                                 metadata=Metadata} = Event}, _From, State) ->
     Location = case Event#uce_event.location of
                    [] ->
                        "";
@@ -216,43 +216,44 @@ handle_call({publish, #uce_event{type = Type,
 
 handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
     LocationStr = case Location of
-		      [] ->
-			  "";
-		      [Org] ->
-			  Org;
-		      [Org,Meeting] ->
-			  Org ++ "/" ++ Meeting
-		  end,
+                      [] ->
+                          "";
+                      [Org] ->
+                          Org;
+                      [Org,Meeting] ->
+                          Org ++ "/" ++ Meeting
+                  end,
     Resp = http_get(State, "/user/" ++ Uid ++ "/acl/" ++ Object ++ "/" ++ Action ++ "/" ++ LocationStr,
-		    [{"uid", State#state.uid},
-		     {"sid", State#state.sid},
-		     {"conditions", Conditions}]),
+                    [{"uid", State#state.uid},
+                     {"sid", State#state.sid},
+                     {"conditions", Conditions}]),
     case Resp of
-	{ok, "200", _, JSONString} ->
-	    {_,[{result,Value}]} = mochijson2:decode(JSONString),
-	    case Value of
-		<<"true">> ->
-		    {reply, true, State};
-		_ ->
-		    {reply, false, State}
-	    end;
-	{ok, _, _, JSONString} ->
-	    {_, [{result, Error}]} = mochijson2:decode(JSONString),
-	    {reply, {error, binary_to_list(Error)}, State};
-	{error, Reason} ->
-	    {reply, {error, Reason}, State};
-	Error ->
-	    {reply, {error, Error}, State}
+        {ok, "200", _, JSONString} ->
+            {_,[{result,Value}]} = mochijson2:decode(JSONString),
+            case Value of
+                <<"true">> ->
+                    {reply, true, State};
+                _ ->
+                    {reply, false, State}
+            end;
+        {ok, _, _, JSONString} ->
+            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+            {reply, {error, binary_to_list(Error)}, State};
+        {error, Reason} ->
+            {reply, {error, Reason}, State};
+        Error ->
+            {reply, {error, Error}, State}
     end;
+
 handle_call({time}, _From, State) ->
     case http_get(State, "/time", []) of
-	{ok, "200", _, JSONString} ->
-	    {_, [{result, Time}]} = mochijson2:decode(JSONString),
-	    {reply, Time, State};
-	{error, Reason} ->
-	    {reply, {error, Reason}, State};
-	Error ->
-	    {reply, {error, Error}, State}
+        {ok, "200", _, JSONString} ->
+            {_, [{result, Time}]} = mochijson2:decode(JSONString),
+            {reply, Time, State};
+        {error, Reason} ->
+            {reply, {error, Reason}, State};
+        Error ->
+            {reply, {error, Error}, State}
     end.
 
 handle_cast(_, State) ->
@@ -281,30 +282,30 @@ http_delete(State, Path, Params) ->
 
 http_request(State, Method, Path, Params) ->
     Query = case Params of
-		[] ->
-		    "";
-		_ ->
-		    "?" ++ url_encode(Params)
+                [] ->
+                    "";
+                _ ->
+                    "?" ++ url_encode(Params)
             end,
     Addr = "http://" ++ State#state.host ++ ":" ++ integer_to_list(State#state.port),
     ibrowse:send_req(Addr ++ "/api/" ++ ?UCE_API_VERSION ++ Path ++ Query, [], Method, []).
 
 url_encode(RawParams) ->
     Params =
-	lists:map(fun({Key, Value}) ->
-			  if
-			      Key == "metadata" ; Key == "conditions" ->
-				  ArrayParams =
-				      lists:map(fun({Name, Data}) ->
-							edoc_lib:escape_uri(Key ++ "[" ++ Name ++ "]") ++ "=" ++
-							    edoc_lib:escape_uri(Data)
-						end,
-						Value),
-				  string:join(ArrayParams, "&");
-			      true ->
-				  edoc_lib:escape_uri(Key) ++ "=" ++
-				      edoc_lib:escape_uri(Value)
-			  end
-		  end,
-		  RawParams),
+        lists:map(fun({Key, Value}) ->
+                          if
+                              Key == "metadata" ; Key == "conditions" ->
+                                  ArrayParams =
+                                      lists:map(fun({Name, Data}) ->
+                                                        edoc_lib:escape_uri(Key ++ "[" ++ Name ++ "]") ++ "=" ++
+                                                            edoc_lib:escape_uri(Data)
+                                                end,
+                                                Value),
+                                  string:join(ArrayParams, "&");
+                              true ->
+                                  edoc_lib:escape_uri(Key) ++ "=" ++
+                                      edoc_lib:escape_uri(Value)
+                          end
+                  end,
+                  RawParams),
     string:join(Params, "&").
