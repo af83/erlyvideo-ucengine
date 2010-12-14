@@ -56,8 +56,8 @@ connect(#rtmp_session{host = Host, addr = Address, player_info = PlayerInfo, ses
 %% @spec play(Session::rtmp_session(), Funcall::rtmp_funcall()) -> NewState::rtmp_session()
 %% @doc Function verify token and reject connection if acl return false
 %%-------------------------------------------------------------------------
-play(#rtmp_session{} = State, _) ->
-    user_can(State, "view").
+play(#rtmp_session{} = State, #rtmp_funcall{args = [null, StreamName]}) ->
+    user_can(State, StreamName, "view").
 
 %%-------------------------------------------------------------------------
 %% @spec publish(Session::rtmp_session(), Funcall::rtmp_funcall()) -> NewState::rtmp_session()
@@ -66,7 +66,7 @@ play(#rtmp_session{} = State, _) ->
 %% @end
 %%-------------------------------------------------------------------------
 publish(#rtmp_session{user_id = Token} = State, #rtmp_funcall{args = [null, StreamName, Spec]}) when is_binary(Spec) ->
-    case user_can(State, "publish") of
+    case user_can(State, StreamName, "publish") of
         unhandled ->
             ucengine_streams:insert(StreamName, Token),
             unhandled;
@@ -75,17 +75,25 @@ publish(#rtmp_session{user_id = Token} = State, #rtmp_funcall{args = [null, Stre
     end.
 
 %%-------------------------------------------------------------------------
-%% @spec user_can(Session::rtmp_session(), Funcall::rtmp_funcall()) -> NewState::rtmp_session()
+%% @spec user_can(Session::rtmp_session(), Name, Funcall::rtmp_funcall()) -> NewState::rtmp_session()
 %% @doc Function verify token with user acl
 %% reject Connection if acl return false
 %% @end
 %%-------------------------------------------------------------------------
-user_can(#rtmp_session{host = Host, user_id=[{org, Org}, {meeting, Meeting}, {uid, Uid}]} = State,Right) ->
-    case ucengine_client:can(Uid, "video", Right, [Org, Meeting]) of
-	true ->
-            ems_log:access(Host, "check acl video.~s ok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
-            unhandled;
+user_can(#rtmp_session{host = Host, user_id=[{org, Org}, {meeting, Meeting}, {uid, Uid}]} = State, Name, Right) ->
+    %% Check if token match current org/meeting
+    StreamName = binary_to_list(Name),
+    case Org ++ "-" ++ Meeting of
+        StreamName ->
+            case ucengine_client:can(Uid, "video", Right, [Org, Meeting]) of
+                true ->
+                    ems_log:access(Host, "check acl video.~s ok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
+                    unhandled;
+                _ ->
+                    ems_log:error(Host, "check acl video:~s nok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
+                    rtmp_session:reject_connection(State)
+            end;
         _ ->
-            ems_log:error(Host, "check acl video:~s nok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
+            ems_log:error(Host, "token and current org/meeting mismatch", []),
             rtmp_session:reject_connection(State)
     end.
