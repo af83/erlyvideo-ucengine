@@ -12,34 +12,8 @@
 	 code_change/3,
 	 terminate/2]).
 
-init(_Args) ->    
+init(_Args) ->
     {ok, []}.
-
-handle_event(#erlyvideo_event{event = stream_started,
-			      host = Host,
-			      stream_name = Name }, State) ->
-
-    Secret = ems:get_var(secret_key, "localhost", undefined),
-    Channel = json_session:decode(Name, Secret),
-
-    [Org64, Meeting64, Uid64] = re:split(Channel,":",[{return,list}]),
-    Org = base64:decode_to_string(Org64),
-    Meeting = base64:decode_to_string(Meeting64),
-    Uid = base64:decode_to_string(Uid64),
-
-    case ucengine_client:can(Uid, "video", "view", [Org,Meeting]) of
-	true ->
-	    Event = #uce_event{type=?UCE_STREAM_START_EVENT,
-			       location=[Org,Meeting],
-			       metadata=[{"stream_name",Name},
-					 {"broadcaster",Uid}]},  
-	    %% push uce_event
-	    ucengine_client:publish(Event);
-	_ ->
-	    ems_log:error(Host, "Action:stream_started video:view (stream_name: ~s) not authorized to ~s", [Name, Uid]),
-	    {error, State}
-    end,
-    {ok,State};
 
 handle_event(#erlyvideo_event{event = stream_stopped,
 			      host = _Host,

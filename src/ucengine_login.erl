@@ -26,6 +26,7 @@
 
 -include_lib("rtmp/include/rtmp.hrl").
 -include("../../../include/rtmp_session.hrl").
+-include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
 
 -export([connect/2, auth/3, publish/2, play/2]).
 
@@ -60,9 +61,20 @@ play(#rtmp_session{} = State, _) ->
 %%-------------------------------------------------------------------------
 %% @spec publish(Session::rtmp_session(), Funcall::rtmp_funcall()) -> NewState::rtmp_session()
 %% @doc Function verify token and reject connection if acl return false
+%%
+%% @end
 %%-------------------------------------------------------------------------
-publish(#rtmp_session{} = State, #rtmp_funcall{args = [null, _, Spec]}) when is_binary(Spec) ->
-    user_can(State, "publish").
+publish(#rtmp_session{user_id=[{org, Org}, {meeting, Meeting}, {uid, Uid}]} = State, #rtmp_funcall{args = [null, _, Spec]}) when is_binary(Spec) ->
+    case user_can(State, "publish") of
+        unhandled ->
+            Event = #uce_event{type=?UCE_STREAM_START_EVENT,
+                               location=[Org, Meeting],
+                               metadata=[{"broadcaster",Uid}]},
+            ucengine_client:publish(Event),
+            unhandled;
+        S ->
+            S
+    end.
 
 %%-------------------------------------------------------------------------
 %% @spec user_can(Session::rtmp_session(), Funcall::rtmp_funcall()) -> NewState::rtmp_session()

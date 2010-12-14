@@ -44,6 +44,8 @@ start_link() ->
     {ok, Pid} = gen_event:start_link({local, ?MODULE}),
     gen_event:add_handler(?MODULE, ucengine_client_event, []),
     gen_event:add_handler(?MODULE, ucengine_ems_event, []),
+
+    ems_event:add_sup_handler(ucengine_ems_event, []),
     {ok, Pid}.
 
 notify(Event) ->
