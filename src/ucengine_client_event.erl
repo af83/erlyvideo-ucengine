@@ -68,7 +68,7 @@ handle_event(#uce_event{id=Id,
 	    {ok, State};
 	_ ->
 	    ems_log:error(default, "Action:uce_join_meeting_event (Org:~s/Meeting:~s) not authorized to ~s", [Org, Meeting, Uid]),
-	    {error, State}
+	    {ok, State}
     end;
 
 handle_event(_, State) ->
