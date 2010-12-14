@@ -138,8 +138,7 @@ receive_events(State, Location, Type, Params, Pid) ->
                                {"type", Type},
                                {"_async", "lp"}]),
     NewParams = case Resp of
-                    {ok, "200", _, JSonResponse} ->
-                        {_, [{result, Array}]} = mochijson2:decode(JSonResponse),
+                    {ok, "200", _, Array} ->
                         Events = [decode_event(JSonEvent) || JSonEvent <- Array],
                         case Events of
                             [] ->
@@ -163,12 +162,10 @@ handle_call({connect, Uid, Credential, Method}, _From, State) ->
     Resp = http_put(State, "/presence/" ++ Uid, [{"auth", Method},
                                                  {"credential", Credential}]),
     case Resp of
-        {ok, "201", _, JSONString} ->
-            {_, [{result, Sid}]} = mochijson2:decode(JSONString),
+        {ok, "201", _, Sid} ->
             {reply, {ok, binary_to_list(Sid)},
              State#state{uid = Uid, sid = binary_to_list(Sid)}};
-        {ok, _, _, JSONString} ->
-            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+        {ok, _, _, Error} ->
             {reply, {error, binary_to_list(Error)}, State};
         {error, Reason} ->
             {reply, {error, Reason}, State};
@@ -202,11 +199,9 @@ handle_call({publish, #uce_event{type = Type,
                                                  {"type", Type},
                                                  {"to", To},
                                                  {"metadata", Metadata}]) of
-        {ok, "201", _, JSONString} ->
-            {_, [{result, Id}]} = mochijson2:decode(JSONString),
+        {ok, "201", _, Id} ->
             {reply, {ok, binary_to_list(Id)}, State};
-        {ok, _, _, JSONString} ->
-            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+        {ok, _, _, Error} ->
             {reply, {error, binary_to_list(Error)}, State};
         {error, Reason} ->
             {reply, {error, Reason}, State};
@@ -228,16 +223,14 @@ handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
                      {"sid", State#state.sid},
                      {"conditions", Conditions}]),
     case Resp of
-        {ok, "200", _, JSONString} ->
-            {_,[{result,Value}]} = mochijson2:decode(JSONString),
+        {ok, "200", _, Value} ->
             case Value of
                 <<"true">> ->
                     {reply, true, State};
                 _ ->
                     {reply, false, State}
             end;
-        {ok, _, _, JSONString} ->
-            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+        {ok, _, _, Error} ->
             {reply, {error, binary_to_list(Error)}, State};
         {error, Reason} ->
             {reply, {error, Reason}, State};
@@ -247,8 +240,7 @@ handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
 
 handle_call({time}, _From, State) ->
     case http_get(State, "/time", []) of
-        {ok, "200", _, JSONString} ->
-            {_, [{result, Time}]} = mochijson2:decode(JSONString),
+        {ok, "200", _, Time} ->
             {reply, Time, State};
         {error, Reason} ->
             {reply, {error, Reason}, State};
@@ -288,7 +280,13 @@ http_request(State, Method, Path, Params) ->
                     "?" ++ url_encode(Params)
             end,
     Addr = "http://" ++ State#state.host ++ ":" ++ integer_to_list(State#state.port),
-    ibrowse:send_req(Addr ++ "/api/" ++ ?UCE_API_VERSION ++ Path ++ Query, [], Method, []).
+    process_response(catch ibrowse:send_req(Addr ++ "/api/" ++ ?UCE_API_VERSION ++ Path ++ Query, [], Method, [])).
+
+process_response({ok, Status, Headers, JSONString}) ->
+    {_, [{result, Json}]} = mochijson2:decode(JSONString),
+    {ok, Status, Headers, Json};
+process_response(R) ->
+    R.
 
 url_encode(RawParams) ->
     Params =
