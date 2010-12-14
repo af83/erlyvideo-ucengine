@@ -22,30 +22,18 @@
 -module(ucengine_client).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
 
--export([start_link/2,
-	 start_link/3,
-	 init/1,
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+         terminate/2, code_change/3]).
 
-	 receive_events/5,
-
-	 connect/2,
-	 connect/3,
-
-	 subscribe/3,
-	 subscribe/4,
-
-	 publish/1,
-
-	 can/4,
-	 can/5,
-
-	 time/0,
-
-	 handle_call/3,
-	 handle_cast/2,
-	 handle_info/2,
-	 code_change/3,
-	 terminate/2]).
+%% API
+-export([start_link/2, start_link/3,
+         receive_events/5,
+         connect/2, connect/3,
+         subscribe/3, subscribe/4,
+         publish/1,
+         can/4, can/5,
+         time/0]).
 
 -include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
 
@@ -153,7 +141,7 @@ receive_events(State, Location, Type, Params, Pid) ->
 		    {ok, "200", _, JSonResponse} ->
 			{_, [{result, Array}]} = mochijson2:decode(JSonResponse),
 			Events = [decode_event(JSonEvent) || JSonEvent <- Array],
-			case Events of 
+			case Events of
 			    [] ->
 				Params;
 			    _ ->
@@ -182,7 +170,7 @@ handle_call({connect, Uid, Credential, Method}, _From, State) ->
 	{ok, _, _, JSONString} ->
 	    {_, [{result, Error}]} = mochijson2:decode(JSONString),
 	    {reply, {error, binary_to_list(Error)}, State};
-	{error, Reason} -> 
+	{error, Reason} ->
 	    {reply, {error, Reason}, State};
 	Error ->
 	    {reply, {error, Error}, State}
@@ -221,7 +209,7 @@ handle_call({publish, #uce_event{type = Type,
 		{ok, _, _, JSONString} ->
 		    {_, [{result, Error}]} = mochijson2:decode(JSONString),
 		    {reply, {error, binary_to_list(Error)}, State};
-		{error, Reason} -> 
+		{error, Reason} ->
 		    {reply, {error, Reason}, State};
 		Error ->
 		    {reply, {error, Error}, State}
@@ -253,7 +241,7 @@ handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
 	{ok, _, _, JSONString} ->
 	    {_, [{result, Error}]} = mochijson2:decode(JSONString),
 	    {reply, {error, binary_to_list(Error)}, State};
-	{error, Reason} -> 
+	{error, Reason} ->
 	    {reply, {error, Reason}, State};
 	Error ->
 	    {reply, {error, Error}, State}
@@ -263,7 +251,7 @@ handle_call({time}, _From, State) ->
 	{ok, "200", _, JSONString} ->
 	    {_, [{result, Time}]} = mochijson2:decode(JSONString),
 	    {reply, Time, State};
-	{error, Reason} -> 
+	{error, Reason} ->
 	    {reply, {error, Reason}, State};
 	Error ->
 	    {reply, {error, Error}, State}
