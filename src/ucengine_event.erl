@@ -1,13 +1,11 @@
 %%% @author     Thierry Bomandouki <thierry.bomandouki@af83.com> [http://af83.com]
-%%% @copyright  2010 AF83 
+%%% @copyright  2010 af83
 %%% @doc        Central point of erlyvideo events
 %%% @reference  See <a href="http://ucengine.org/" target="_top">http://ucenegine.org/</a> for more information
 %%% @end
 %%%
+%%% This file is part of erlyvideo.
 %%%
-%%% The MIT License
-%%%
-%%% Copyright (c) 2009 Max Lapshin
 %%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy
 %%% of this software and associated documentation files (the "Software"), to deal
@@ -37,11 +35,9 @@
 
 -export([start_link/0, notify/1]).
 
-%% gen_event callbacks
--export([init/1]).
-
 start_link() ->
     {ok, Pid} = gen_event:start_link({local, ?MODULE}),
+
     gen_event:add_handler(?MODULE, ucengine_client_event, []),
     gen_event:add_handler(?MODULE, ucengine_ems_event, []),
 
@@ -50,19 +46,3 @@ start_link() ->
 
 notify(Event) ->
     gen_event:notify(?MODULE, Event).
-
-%%%------------------------------------------------------------------------
-%%% Callback functions from gen_event
-%%%------------------------------------------------------------------------
-
-%%----------------------------------------------------------------------
-%% @spec (InitArgs) -> {ok, State}           |
-%%                     {ok, State, hibernate}
-%%
-%% @doc Called by gen_event framework at process startup.
-%% @end
-%%----------------------------------------------------------------------
-
-init([]) ->
-    io:format("INIT~n"),
-  {ok, []}.

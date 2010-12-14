@@ -15,17 +15,26 @@
 init(_Args) ->
     {ok, []}.
 
-handle_event(#erlyvideo_event{event = stream_stopped,
-			      host = _Host,
-			      stream_name = Name},
+handle_event(#erlyvideo_event{event = stream_started,
+			      stream_name = StreamName},
 	     State) ->
-    Secret = ems:get_var(secret_key, "localhost", undefined),
-    Channel = json_session:decode(Name, Secret),
-    [Org, Meeting, Uid] = re:split(Channel,":",[{return,list}]),
+    %% search last publisher
+    {ok, [{StreamName, [{org, Org}, {meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
+    Event = #uce_event{type=?UCE_STREAM_START_EVENT,
+		       location=[Org,Meeting],
+		       metadata=[{"broadcaster",Uid}]},
+    %% push uce_event
+    ucengine_client:publish(Event),
+    {ok, State};
+
+handle_event(#erlyvideo_event{event = stream_stopped,
+			      stream_name = StreamName},
+	     State) ->
+    %% search last publisher
+    {ok, [{StreamName, [{org, Org}, {meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
     Event = #uce_event{type=?UCE_STREAM_STOP_EVENT,
 		       location=[Org,Meeting],
-		       metadata=[{"stream_name",Name},
-				 {"broadcaster",Uid}]},
+		       metadata=[{"broadcaster",Uid}]},
     %% push uce_event
     ucengine_client:publish(Event),
     {ok, State};

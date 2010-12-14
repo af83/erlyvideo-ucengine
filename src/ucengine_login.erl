@@ -43,6 +43,7 @@ connect(#rtmp_session{} = State, #rtmp_funcall{args = [_, SessionData|_]}) ->
     Secret = ems:get_var(secret_key, "localhost", undefined),
     Token = json_session:decode(binary_to_list(SessionData), Secret),
     NewState = State#rtmp_session{user_id = Token},
+    %% TODO: we should check StreamName
     rtmp_session:accept_connection(NewState),
     NewState;
 
@@ -64,13 +65,10 @@ play(#rtmp_session{} = State, _) ->
 %%
 %% @end
 %%-------------------------------------------------------------------------
-publish(#rtmp_session{user_id=[{org, Org}, {meeting, Meeting}, {uid, Uid}]} = State, #rtmp_funcall{args = [null, _, Spec]}) when is_binary(Spec) ->
+publish(#rtmp_session{user_id = Token} = _State, #rtmp_funcall{args = [null, StreamName, Spec]}) when is_binary(Spec) ->
     case user_can(State, "publish") of
         unhandled ->
-            Event = #uce_event{type=?UCE_STREAM_START_EVENT,
-                               location=[Org, Meeting],
-                               metadata=[{"broadcaster",Uid}]},
-            ucengine_client:publish(Event),
+            ucengine_streams:insert(StreamName, Token),
             unhandled;
         S ->
             S
