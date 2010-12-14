@@ -1,10 +1,10 @@
 %%% @author     Thierry Bomandouki <thierry.bomandouki@af83.com> [http://af83.com]
 %%% @copyright  2010 af83
-%%% @doc        Central point of erlyvideo events
+%%% @doc
 %%% @reference  See <a href="http://ucengine.org/" target="_top">http://ucenegine.org/</a> for more information
 %%% @end
 %%%
-%%% This file is part of erlyvideo.
+%%% This file is part of erlyvideo-ucengine.
 %%%
 %%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy

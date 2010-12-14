@@ -1,10 +1,9 @@
-%%%-------------------------------------------------------------------
-%%% @author François de Metz <fdemetz@af83.com>
-%%% @copyright (C) 2010, af83
+%%% @author      François de Metz <fdemetz@af83.com>
+%%% @copyright   2010 af83
 %%% @doc
 %%%
 %%% @end
-%%% This file is part of ucengine-erlyvideo.
+%%% This file is part of erlyvideo-ucengine.
 %%%
 %%% erlyvideo is free software: you can redistribute it and/or modify
 %%% it under the terms of the GNU General Public License as published by
@@ -31,14 +30,14 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--define(SERVER, ?MODULE). 
+-define(SERVER, ?MODULE).
 
 -record(state, {
           tabid
 }).
 
 %%
-%% Insert stream 
+%% Insert stream
 %%
 insert(StreamName, Token) ->
     gen_server:call(?SERVER, {insert, StreamName, Token}).
@@ -151,7 +150,3 @@ terminate(_Reason, _State) ->
 %%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================

@@ -1,10 +1,9 @@
 %%% @author     Thierry Bomandouki <thierry.bomandouki@af83.com> [http://ucengine.org]
 %%% @copyright  2010 af83
-%%% @doc        Functions to detect different kinds of media, according to their urls
-%%% @reference  See <a href="http://erlyvideo.org/" target="_top">http://erlyvideo.org/</a> for more information
+%%% @doc
 %%% @end
 %%%
-%%% This file is part of erlyvideo.
+%%% This file is part of erlyvideo-ucengine.
 %%%
 %%% erlyvideo is free software: you can redistribute it and/or modify
 %%% it under the terms of the GNU General Public License as published by

@@ -1,11 +1,10 @@
 %%% @author     Thierry Bomandouki <thierry.bomandouki@af83.com> [http://ucengine.org]
 %%% @copyright  2010 af83
-%%% @doc        Functions to detect different kinds of media, according to their urls
-%%% @reference  See <a href="http://erlyvideo.org/" target="_top">http://erlyvideo.org/</a> for more information
+%%% @doc
 %%% @end
 %%%
-%%% This file is part of erlyvideo.
-%%% 
+%%% This file is part of erlyvideo-ucengine.
+%%%
 %%% erlyvideo is free software: you can redistribute it and/or modify
 %%% it under the terms of the GNU General Public License as published by
 %%% the Free Software Foundation, either version 3 of the License, or
@@ -26,11 +25,11 @@
 -export([start/0, stop/0, start_ucengine/0]).
 
 %% UCE PLUGIN API
-start() -> 
+start() ->
     application:start(ucengine),
     ok.
-  
-stop() -> 
+
+stop() ->
     application:stop(ucengine),
     application:unload(ucengine).
 
