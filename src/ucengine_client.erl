@@ -175,45 +175,43 @@ handle_call({connect, Uid, Credential, Method}, _From, State) ->
 	Error ->
 	    {reply, {error, Error}, State}
     end;
+
+handle_call({subscribe, _Location, _Type, _Params, _Pid}, _From, #state{uid = Uid, sid = Sid} = State) when Uid == undefined;  Sid == undefined ->
+    {reply, {error, not_connected}, State};
+
 handle_call({subscribe, Location, Type, Params, Pid}, _From, State) ->
-    if
-  	State#state.uid == undefined ; State#state.sid == undefined ->
-	    {reply, {error, not_connected}, State};
-  	true ->
-	    ListenerPid = spawn_link(?MODULE, receive_events, [State, Location, Type, Params, Pid]),
-	    {reply, {ok, ListenerPid}, State}
-    end;
+    ListenerPid = spawn_link(?MODULE, receive_events, [State, Location, Type, Params, Pid]),
+    {reply, {ok, ListenerPid}, State};
+
+handle_call({publish, #uce_event{}}, _From, #state{uid = Uid, sid = Sid} = State) when Uid == undefined;  Sid == undefined ->
+    {reply, {error, not_connected}, State};
+
 handle_call({publish, #uce_event{type = Type,
 				 to = To,
 				 metadata=Metadata} = Event}, _From, State) ->
-    if
-  	State#state.uid == undefined ; State#state.sid == undefined ->
-	    {reply, {error, not_connected}, State};
-  	true ->
-	    Location = case Event#uce_event.location of
-			   [] ->
-			       "";
-			   [Org] ->
-			       Org;
-			   [Org,Meeting] ->
-			       Org ++ "/" ++ Meeting
-		       end,
-	    case http_put(State, "/event/" ++ Location, [{"uid", State#state.uid},
-							 {"sid", State#state.sid},
-							 {"type", Type},
-							 {"to", To},
-							 {"metadata", Metadata}]) of
-		{ok, "201", _, JSONString} ->
-		    {_, [{result, Id}]} = mochijson2:decode(JSONString),
-		    {reply, {ok, binary_to_list(Id)}, State};
-		{ok, _, _, JSONString} ->
-		    {_, [{result, Error}]} = mochijson2:decode(JSONString),
-		    {reply, {error, binary_to_list(Error)}, State};
-		{error, Reason} ->
-		    {reply, {error, Reason}, State};
-		Error ->
-		    {reply, {error, Error}, State}
-	    end
+    Location = case Event#uce_event.location of
+                   [] ->
+                       "";
+                   [Org] ->
+                       Org;
+                   [Org,Meeting] ->
+                       Org ++ "/" ++ Meeting
+               end,
+    case http_put(State, "/event/" ++ Location, [{"uid", State#state.uid},
+                                                 {"sid", State#state.sid},
+                                                 {"type", Type},
+                                                 {"to", To},
+                                                 {"metadata", Metadata}]) of
+        {ok, "201", _, JSONString} ->
+            {_, [{result, Id}]} = mochijson2:decode(JSONString),
+            {reply, {ok, binary_to_list(Id)}, State};
+        {ok, _, _, JSONString} ->
+            {_, [{result, Error}]} = mochijson2:decode(JSONString),
+            {reply, {error, binary_to_list(Error)}, State};
+        {error, Reason} ->
+            {reply, {error, Reason}, State};
+        Error ->
+            {reply, {error, Error}, State}
     end;
 
 handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
