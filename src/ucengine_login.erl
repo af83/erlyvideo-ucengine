@@ -65,7 +65,7 @@ play(#rtmp_session{} = State, _) ->
 %%
 %% @end
 %%-------------------------------------------------------------------------
-publish(#rtmp_session{user_id = Token} = _State, #rtmp_funcall{args = [null, StreamName, Spec]}) when is_binary(Spec) ->
+publish(#rtmp_session{user_id = Token} = State, #rtmp_funcall{args = [null, StreamName, Spec]}) when is_binary(Spec) ->
     case user_can(State, "publish") of
         unhandled ->
             ucengine_streams:insert(StreamName, Token),
