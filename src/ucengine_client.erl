@@ -124,6 +124,16 @@ decode_event({_, Event}) ->
     end.
 
 receive_events(State, Location, Type, Params, Pid) ->
+    %% We just want to flush mailbox
+    %% ibrowse send message on timeout
+    receive
+        E ->
+            ok
+        after
+            0 ->
+                ok
+    end,
+
     LocationStr = case Location of
                       [] ->
                           "";
