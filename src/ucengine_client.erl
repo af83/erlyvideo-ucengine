@@ -79,6 +79,7 @@ connect(Uid, Credential) ->
 connect(Uid, Credential, Method) ->
     gen_server:call(?MODULE, {connect, Uid, Credential, Method}).
 
+%%
 %% Subscribe to an event stream. The 'location' parameter is where you're expecting
 %% the events to come:
 %% * ["organisation", "meeting"]: events from a specific meeting.
@@ -96,14 +97,23 @@ subscribe(Location, Type, Pid) ->
 subscribe(Location, Type, Params, Pid) ->
     gen_server:call(?MODULE, {subscribe, Location, Type, Params, Pid}).
 
+%%
+%% Publish event
+%%
 publish(#uce_event{} = Event) ->
     gen_server:call(?MODULE, {publish, Event}).
 
+%%
+%% check ACL
+%%
 can(Uid, Object, Action, Location) ->
     can(Uid, Object, Action, Location, []).
 can(Uid, Object, Action, Location, Conditions) ->
     gen_server:call(?MODULE, {can, Uid, Object, Action, Location, Conditions}).
 
+%%
+%% get server time
+%%
 time() ->
     gen_server:call(?MODULE, {time}).
 
@@ -271,6 +281,10 @@ handle_info(_Info, State) ->
 
 terminate(_Reason, _State) ->
     ok.
+
+%%
+%% Private functions
+%%
 
 http_get(State, Path, Params) ->
     http_request(State, get, Path, Params).

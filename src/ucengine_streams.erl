@@ -42,6 +42,9 @@
 insert(StreamName, Token) ->
     gen_server:call(?SERVER, {insert, StreamName, Token}).
 
+%%
+%% Lookup stream
+%%
 lookup(StreamName) ->
     gen_server:call(?SERVER, {lookup, StreamName}).
 
