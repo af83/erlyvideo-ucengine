@@ -2,8 +2,7 @@
 
 ## Introduction
 
-erlyvideo_ucengine is a plugin to bind Erlyvideo events and UCengine events, it allows UCengine clients
-to connect to Erlyvideo through UCengine events.
+[erlyvideo_ucengine](https://github.com/AF83/erlyvideo-ucengine) is a plugin to bind Erlyvideo events and UCengine events, it allows UCengine clients to connect to Erlyvideo through UCengine events.
 
 ## Docs
 
@@ -60,4 +59,3 @@ And replace *trusted_login* by *ucengine_login* in *rtmp_handlers*, like that:
 Copyright 2010, af83
 
 The default license for all files is GPLv3.
-
