@@ -127,8 +127,10 @@ receive_events(State, Location, Type, Params, Pid) ->
     %% We just want to flush mailbox
     %% ibrowse send message on timeout
     receive
-        E ->
-            ok
+        {_Pid, {error,req_timedout}} ->
+            ok;
+        Message ->
+            ems_log:error(default, "event not recognized ~p", [Message])
         after
             0 ->
                 ok
