@@ -39,25 +39,19 @@ init(_Args) ->
 handle_event(#erlyvideo_event{event = stream_started,
 			      stream_name = StreamName},
 	     State) ->
-    %% search last publisher
-    {ok, [{StreamName, [{org, Org}, {meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
-    Event = #uce_event{type=?UCE_STREAM_START_EVENT,
-		       location=[Org,Meeting],
-		       metadata=[{"broadcaster",Uid}]},
-    %% push uce_event
-    ucengine_client:publish(Event),
+    send_stream_event(StreamName, ?UCE_STREAM_START_EVENT),
+    {ok, State};
+
+handle_event(#erlyvideo_event{event =  stream_source_lost,
+			      stream_name = StreamName},
+	     State) ->
+    send_stream_event(StreamName, ?UCE_STREAM_LOST_EVENT),
     {ok, State};
 
 handle_event(#erlyvideo_event{event = stream_stopped,
 			      stream_name = StreamName},
 	     State) ->
-    %% search last publisher
-    {ok, [{StreamName, [{org, Org}, {meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
-    Event = #uce_event{type=?UCE_STREAM_STOP_EVENT,
-		       location=[Org,Meeting],
-		       metadata=[{"broadcaster",Uid}]},
-    %% push uce_event
-    ucengine_client:publish(Event),
+    send_stream_event(StreamName, ?UCE_STREAM_STOP_EVENT),
     {ok, State};
 
 handle_event(_, State) ->
@@ -73,4 +67,24 @@ code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
 terminate(_Args, _State) ->
+    ok.
+
+%%--------------------------------------------------------------------
+%% Private functions
+%%--------------------------------------------------------------------
+
+%%--------------------------------------------------------------------
+%% @spec send_stream_event(StreamName, Type) -> ok
+%%
+%% @doc send event to UC Engine about stream
+%% @end
+%%----------------------------------------------------------------------
+send_stream_event(StreamName, Type) ->
+    %% search last publisher
+    {ok, [{StreamName, [{org, Org}, {meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
+    Event = #uce_event{type=Type,
+		       location=[Org,Meeting],
+		       metadata=[{"broadcaster",Uid}]},
+    %% push uce_event
+    ucengine_client:publish(Event),
     ok.
