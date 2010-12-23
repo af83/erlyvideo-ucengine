@@ -47,27 +47,24 @@ init(_Args) ->
 %%-------------------------------------------------------------------------
 handle_event(#uce_event{id=Id,
 			type=?UCE_MEETING_JOIN_EVENT,
-			location = [Org,Meeting],
+			location = [Meeting],
 			from = Uid}, State) ->
-    case ucengine_client:can(Uid, "video", "view", [Org, Meeting], []) of
+    case ucengine_client:can(Uid, "video", "view", [Meeting], []) of
 	true ->
 	    Secret = ems:get_var(secret_key, "localhost", undefined),
-	    Token = json_session:encode([{"org", Org},
-                                         {"meeting", Meeting},
+	    Token = json_session:encode([{"meeting", Meeting},
                                          {"uid", Uid}], Secret),
-	    Channel = Org ++ "-" ++ Meeting,
 	    Event = #uce_event{type=?UCE_STREAM_NEW_EVENT,
-			       location=[Org,Meeting],
+			       location=[Meeting],
 			       parent=Id,
 			       to=Uid,
 			       metadata=[{"token", binary_to_list(Token)},
-					 {"channel", Channel}]},
+					 {"channel", Meeting}]},
 	    %% push uce_event
-	    io:format("PUB: ~p~n", [Event]),
 	    ucengine_client:publish(Event),
 	    {ok, State};
 	_ ->
-	    ems_log:error(default, "Action:uce_join_meeting_event (Org:~s/Meeting:~s) not authorized to ~s", [Org, Meeting, Uid]),
+	    ems_log:error(default, "Action:uce_join_meeting_event (Meeting:~s) not authorized to ~s", [Meeting, Uid]),
 	    {ok, State}
     end;
 

@@ -82,8 +82,7 @@ connect(Uid, Credential, Method) ->
 %%
 %% Subscribe to an event stream. The 'location' parameter is where you're expecting
 %% the events to come:
-%% * ["organisation", "meeting"]: events from a specific meeting.
-%% * ["organisation"]: events from all meetings of the organisation and for the organisation itself.
+%% * ["meeting"]: events from a specific meeting.
 %% * []: all events.
 %%
 %% The function takes extra parameters:
@@ -119,15 +118,15 @@ time() ->
 
 decode_event({_, Event}) ->
     case utils:get(Event,
-                   [id, datetime, from, org, meeting, type, parent, metadata],
-                   [none, none, none, <<"">>, <<"">>, none, <<"">>, {array, []}]) of
+                   [id, datetime, from, meeting, type, parent, metadata],
+                   [none, none, none, <<"">>, none, <<"">>, {array, []}]) of
         {error, Reason} ->
             {error, Reason};
-        [Id, Datetime, From, Org, Meeting, Type, Parent, {_, Metadata}] ->
+        [Id, Datetime, From, Meeting, Type, Parent, {_, Metadata}] ->
             #uce_event{id=binary_to_list(Id),
                        datetime=Datetime,
                        from=binary_to_list(From),
-                       location=[binary_to_list(Org), binary_to_list(Meeting)],
+                       location=[binary_to_list(Meeting)],
                        type=binary_to_list(Type),
                        parent=binary_to_list(Parent),
                        metadata=[{binary_to_list(Key), binary_to_list(Value)} || {Key, Value} <- Metadata]}
@@ -149,10 +148,8 @@ receive_events(State, Location, Type, Params, Pid) ->
     LocationStr = case Location of
                       [] ->
                           "";
-                      [Org] ->
-                          Org;
-                      [Org,Meeting] ->
-                          Org ++ "/" ++ Meeting
+                      [Meeting] ->
+                          Meeting
                   end,
     Resp = http_get(State, "/event/" ++ LocationStr,
                     Params ++ [{"uid", State#state.uid},
@@ -161,6 +158,7 @@ receive_events(State, Location, Type, Params, Pid) ->
                                {"_async", "lp"}]),
     NewParams = case Resp of
                     {ok, "200", _, Array} ->
+                        ems_log:error(default, "jsonevent ~p", [Array]),
                         Events = [decode_event(JSonEvent) || JSonEvent <- Array],
                         case Events of
                             [] ->
@@ -211,10 +209,8 @@ handle_call({publish, #uce_event{type = Type,
     Location = case Event#uce_event.location of
                    [] ->
                        "";
-                   [Org] ->
-                       Org;
-                   [Org,Meeting] ->
-                       Org ++ "/" ++ Meeting
+                   [Meeting] ->
+                       Meeting
                end,
     case http_put(State, "/event/" ++ Location, [{"uid", State#state.uid},
                                                  {"sid", State#state.sid},
@@ -235,10 +231,8 @@ handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
     LocationStr = case Location of
                       [] ->
                           "";
-                      [Org] ->
-                          Org;
-                      [Org,Meeting] ->
-                          Org ++ "/" ++ Meeting
+                      [Meeting] ->
+                          Meeting
                   end,
     Resp = http_get(State, "/user/" ++ Uid ++ "/acl/" ++ Object ++ "/" ++ Action ++ "/" ++ LocationStr,
                     [{"uid", State#state.uid},

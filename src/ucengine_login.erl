@@ -80,20 +80,20 @@ publish(#rtmp_session{user_id = Token} = State, #rtmp_funcall{args = [null, Stre
 %% reject Connection if acl return false
 %% @end
 %%-------------------------------------------------------------------------
-user_can(#rtmp_session{host = Host, user_id=[{org, Org}, {meeting, Meeting}, {uid, Uid}]} = State, Name, Right) ->
-    %% Check if token match current org/meeting
+user_can(#rtmp_session{host = Host, user_id=[{meeting, Meeting}, {uid, Uid}]} = State, Name, Right) ->
+    %% Check if token match current meeting
     StreamName = binary_to_list(Name),
-    case Org ++ "-" ++ Meeting of
+    case Meeting of
         StreamName ->
-            case ucengine_client:can(Uid, "video", Right, [Org, Meeting]) of
+            case ucengine_client:can(Uid, "video", Right, [Meeting]) of
                 true ->
-                    ems_log:access(Host, "check acl video.~s ok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
+                    ems_log:access(Host, "check acl video.~s ok (meeting: ~s, uid: ~s)", [Right, Meeting, Uid]),
                     unhandled;
                 _ ->
-                    ems_log:error(Host, "check acl video:~s nok (org: ~s, meeting: ~s, uid: ~s)", [Right, Org, Meeting, Uid]),
+                    ems_log:error(Host, "check acl video:~s nok (meeting: ~s, uid: ~s)", [Right, Meeting, Uid]),
                     rtmp_session:reject_connection(State)
             end;
         _ ->
-            ems_log:error(Host, "token and current org/meeting mismatch", []),
+            ems_log:error(Host, "token and current meeting mismatch", []),
             rtmp_session:reject_connection(State)
     end.
