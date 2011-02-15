@@ -179,8 +179,9 @@ receive_events(State, Location, Type, Params, Pid) ->
     receive_events(State, Location, Type, NewParams, Pid).
 
 handle_call({connect, Uid, Credential, Method}, _From, State) ->
-    Resp = http_put(State, "/presence/" ++ Uid, [{"auth", Method},
-                                                 {"credential", Credential}]),
+    Resp = http_post(State, "/presence/", [{"uid", Uid},
+                                           {"auth", Method},
+                                           {"credential", Credential}]),
     case Resp of
         {ok, "201", _, Sid} ->
             {reply, {ok, binary_to_list(Sid)},
@@ -212,11 +213,11 @@ handle_call({publish, #uce_event{type = Type,
                    [Meeting] ->
                        Meeting
                end,
-    case http_put(State, "/event/" ++ Location, [{"uid", State#state.uid},
-                                                 {"sid", State#state.sid},
-                                                 {"type", Type},
-                                                 {"to", To},
-                                                 {"metadata", Metadata}]) of
+    case http_post(State, "/event/" ++ Location, [{"uid", State#state.uid},
+                                                  {"sid", State#state.sid},
+                                                  {"type", Type},
+                                                  {"to", To},
+                                                  {"metadata", Metadata}]) of
         {ok, "201", _, Id} ->
             {reply, {ok, binary_to_list(Id)}, State};
         {ok, _, _, Error} ->
