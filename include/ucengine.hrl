@@ -5,16 +5,16 @@
           id = none,
           % date (ms from epoch)
           datetime = none,
-          %% location = [Org,Meeting]
-          location = [],
+          %% location
+          location = "",
           %% From: uid|brick
           from,
           %% Type event : list 
           type,
           %% parent id
           parent = "",
-	  %% to id
-	  to = "all",
+          %% to id
+          to = "all",
           %% MetaData : list
           metadata = []}).
 

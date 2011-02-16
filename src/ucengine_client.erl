@@ -82,8 +82,8 @@ connect(Uid, Credential, Method) ->
 %%
 %% Subscribe to an event stream. The 'location' parameter is where you're expecting
 %% the events to come:
-%% * ["meeting"]: events from a specific meeting.
-%% * []: all events.
+%% * "meeting": events from a specific meeting.
+%% * "": all events.
 %%
 %% The function takes extra parameters:
 %% :type => the type of event (ex. 'chat.message.new', 'internal.user.add', etc).
@@ -118,15 +118,15 @@ time() ->
 
 decode_event({_, Event}) ->
     case utils:get(Event,
-                   [id, datetime, from, meeting, type, parent, metadata],
+                   [id, datetime, from, location, type, parent, metadata],
                    [none, none, none, <<"">>, none, <<"">>, {array, []}]) of
         {error, Reason} ->
             {error, Reason};
-        [Id, Datetime, From, Meeting, Type, Parent, {_, Metadata}] ->
+        [Id, Datetime, From, Location, Type, Parent, {_, Metadata}] ->
             #uce_event{id=binary_to_list(Id),
                        datetime=Datetime,
                        from=binary_to_list(From),
-                       location=[binary_to_list(Meeting)],
+                       location=binary_to_list(Location),
                        type=binary_to_list(Type),
                        parent=binary_to_list(Parent),
                        metadata=[{binary_to_list(Key), binary_to_list(Value)} || {Key, Value} <- Metadata]}
@@ -145,13 +145,7 @@ receive_events(State, Location, Type, Params, Pid) ->
                 ok
     end,
 
-    LocationStr = case Location of
-                      [] ->
-                          "";
-                      [Meeting] ->
-                          Meeting
-                  end,
-    Resp = http_get(State, "/event/" ++ LocationStr,
+    Resp = http_get(State, "/event/" ++ Location,
                     Params ++ [{"uid", State#state.uid},
                                {"sid", State#state.sid},
                                {"type", Type},
@@ -207,17 +201,11 @@ handle_call({publish, #uce_event{}}, _From, #state{uid = Uid, sid = Sid} = State
 handle_call({publish, #uce_event{type = Type,
                                  to = To,
                                  metadata=Metadata} = Event}, _From, State) ->
-    Location = case Event#uce_event.location of
-                   [] ->
-                       "";
-                   [Meeting] ->
-                       Meeting
-               end,
-    case http_post(State, "/event/" ++ Location, [{"uid", State#state.uid},
-                                                  {"sid", State#state.sid},
-                                                  {"type", Type},
-                                                  {"to", To},
-                                                  {"metadata", Metadata}]) of
+    case http_post(State, "/event/" ++ Event#uce_event.location, [{"uid", State#state.uid},
+                                                                  {"sid", State#state.sid},
+                                                                  {"type", Type},
+                                                                  {"to", To},
+                                                                  {"metadata", Metadata}]) of
         {ok, "201", _, Id} ->
             {reply, {ok, binary_to_list(Id)}, State};
         {ok, _, _, Error} ->
@@ -229,13 +217,7 @@ handle_call({publish, #uce_event{type = Type,
     end;
 
 handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
-    LocationStr = case Location of
-                      [] ->
-                          "";
-                      [Meeting] ->
-                          Meeting
-                  end,
-    Resp = http_get(State, "/user/" ++ Uid ++ "/acl/" ++ Object ++ "/" ++ Action ++ "/" ++ LocationStr,
+    Resp = http_get(State, "/user/" ++ Uid ++ "/acl/" ++ Object ++ "/" ++ Action ++ "/" ++ Location,
                     [{"uid", State#state.uid},
                      {"sid", State#state.sid},
                      {"conditions", Conditions}]),

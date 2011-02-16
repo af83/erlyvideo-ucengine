@@ -46,20 +46,20 @@ init(_Args) ->
 %% @private
 %%-------------------------------------------------------------------------
 handle_event(#uce_event{id=Id,
-			type=?UCE_MEETING_JOIN_EVENT,
-			location = [Meeting],
-			from = Uid}, State) ->
-    case ucengine_client:can(Uid, "video", "view", [Meeting], []) of
+                        type=?UCE_MEETING_JOIN_EVENT,
+                        location = Meeting,
+                        from = Uid}, State) ->
+    case ucengine_client:can(Uid, "video", "view", Meeting, []) of
 	true ->
 	    Secret = ems:get_var(secret_key, "localhost", undefined),
 	    Token = json_session:encode([{"meeting", Meeting},
                                          {"uid", Uid}], Secret),
 	    Event = #uce_event{type=?UCE_STREAM_NEW_EVENT,
-			       location=[Meeting],
-			       parent=Id,
-			       to=Uid,
-			       metadata=[{"token", binary_to_list(Token)},
-					 {"channel", Meeting}]},
+                           location=Meeting,
+                           parent=Id,
+                           to=Uid,
+                           metadata=[{"token", binary_to_list(Token)},
+                                     {"channel", Meeting}]},
 	    %% push uce_event
 	    ucengine_client:publish(Event),
 	    {ok, State};
