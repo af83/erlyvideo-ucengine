@@ -14,7 +14,7 @@
           %% parent id
           parent = "",
           %% to id
-          to = "all",
+          to = "",
           %% MetaData : list
           metadata = []}).
 

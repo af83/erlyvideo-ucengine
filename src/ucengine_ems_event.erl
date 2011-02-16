@@ -83,7 +83,7 @@ send_stream_event(StreamName, Type) ->
     %% search last publisher
     {ok, [{StreamName, [{meeting, Meeting}, {uid, Uid}]}]} = ucengine_streams:lookup(StreamName),
     Event = #uce_event{type=Type,
-		       location=[Meeting],
+		       location=Meeting,
 		       metadata=[{"broadcaster", Uid}]},
     %% push uce_event
     ucengine_client:publish(Event),
