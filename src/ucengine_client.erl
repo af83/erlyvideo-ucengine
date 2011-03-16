@@ -238,7 +238,8 @@ handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
     end;
 
 handle_call({time}, _From, State) ->
-    case http_get(State, "/time", []) of
+    case http_get(State, "/time", [{"uid", State#state.uid},
+                                   {"sid", State#state.sid}]) of
         {ok, "200", _, Time} ->
             {reply, Time, State};
         {error, Reason} ->
