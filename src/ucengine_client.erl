@@ -172,14 +172,20 @@ receive_events(State, Location, Type, Params, Pid) ->
                 end,
     receive_events(State, Location, Type, NewParams, Pid).
 
-handle_call({connect, Uid, Credential, Method}, _From, State) ->
-    Resp = http_post(State, "/presence/", [{"uid", Uid},
+handle_call({connect, Name, Credential, Method}, _From, State) ->
+    Resp = http_post(State, "/presence/", [{"name", Name},
                                            {"auth", Method},
                                            {"credential", Credential}]),
     case Resp of
-        {ok, "201", _, Sid} ->
-            {reply, {ok, binary_to_list(Sid)},
-             State#state{uid = Uid, sid = binary_to_list(Sid)}};
+        {ok, "201", _, Result} ->
+            case utils:get(Result, [uid, sid]) of
+                [Uid, Sid]
+                  when is_list(Uid) and is_list(Sid) ->
+                    {reply, {ok, binary_to_list(Sid)},
+                     State#state{uid = Uid, sid = binary_to_list(Sid)}};
+                _ ->
+                    {reply, {error, "unexpected error"}}
+            end;
         {ok, _, _, Error} ->
             {reply, {error, binary_to_list(Error)}, State};
         {error, Reason} ->

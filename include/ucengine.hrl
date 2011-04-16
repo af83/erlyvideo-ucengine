@@ -24,4 +24,4 @@
 -define(UCE_STREAM_START_EVENT, "video.stream.start").
 -define(UCE_STREAM_LOST_EVENT, "video.stream.lost").
 -define(UCE_STREAM_STOP_EVENT, "video.stream.stop").
--define(UCE_API_VERSION, "0.4").
+-define(UCE_API_VERSION, "0.5").
