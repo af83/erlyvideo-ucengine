@@ -177,12 +177,12 @@ handle_call({connect, Name, Credential, Method}, _From, State) ->
                                            {"auth", Method},
                                            {"credential", Credential}]),
     case Resp of
-        {ok, "201", _, Result} ->
+        {ok, "201", _, {object, Result}} ->
             case utils:get(Result, [uid, sid]) of
                 [Uid, Sid]
-                  when is_list(Uid) and is_list(Sid) ->
+                  when is_binary(Uid) and is_binary(Sid) ->
                     {reply, {ok, binary_to_list(Sid)},
-                     State#state{uid = Uid, sid = binary_to_list(Sid)}};
+                     State#state{uid = binary_to_list(Uid), sid = binary_to_list(Sid)}};
                 _ ->
                     {reply, {error, "unexpected error"}}
             end;
@@ -223,7 +223,7 @@ handle_call({publish, #uce_event{type = Type,
     end;
 
 handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
-    Resp = http_get(State, "/user/" ++ Uid ++ "/acl/" ++ Object ++ "/" ++ Action ++ "/" ++ Location,
+    Resp = http_get(State, "/user/" ++ Uid ++ "/can/" ++ Object ++ "/" ++ Action ++ "/" ++ Location,
                     [{"uid", State#state.uid},
                      {"sid", State#state.sid},
                      {"conditions", Conditions}]),
