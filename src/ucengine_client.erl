@@ -223,7 +223,7 @@ handle_call({publish, #uce_event{type = Type,
     end;
 
 handle_call({can, Uid, Object, Action, Location, Conditions}, _From, State) ->
-    Resp = http_get(State, "/user/" ++ Uid ++ "/can/" ++ Object ++ "/" ++ Action ++ "/" ++ Location,
+    Resp = http_get(State, "/user/" ++ Uid ++ "/can/" ++ Action ++ "/" ++ Object ++ "/" ++ Location,
                     [{"uid", State#state.uid},
                      {"sid", State#state.sid},
                      {"conditions", Conditions}]),
