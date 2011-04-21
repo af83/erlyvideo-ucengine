@@ -28,7 +28,7 @@
 %%%---------------------------------------------------------------------------------------
 -module(ucengine_event).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
--include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("ucengine.hrl").
 -include("erlyvideo.hrl").
 
 %% External API

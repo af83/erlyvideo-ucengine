@@ -21,7 +21,7 @@
 %%%---------------------------------------------------------------------------------------
 -module(ucengine_ems_event).
 
--include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("ucengine.hrl").
 -include("erlyvideo.hrl").
 
 -behaviour(gen_event).

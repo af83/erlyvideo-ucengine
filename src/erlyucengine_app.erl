@@ -26,7 +26,7 @@
 
 -export([start/2, stop/1, config_change/3, handle_events/0]).
 
--include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("ucengine.hrl").
 
 %%--------------------------------------------------------------------
 %% @spec (Type::any(), Args::list()) -> any()

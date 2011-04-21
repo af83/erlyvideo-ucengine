@@ -23,10 +23,9 @@
 -author('François de Metz <fdemetz@af83.com>').
 
 -include("erlyvideo.hrl").
-
 -include_lib("rtmp/include/rtmp.hrl").
 -include("../../../include/rtmp_session.hrl").
--include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("ucengine.hrl").
 
 -export([connect/2, auth/3, publish/2, play/2]).
 

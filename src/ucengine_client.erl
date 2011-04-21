@@ -35,7 +35,7 @@
          can/4, can/5,
          time/0]).
 
--include("plugins/erlyvideo-ucengine/include/ucengine.hrl").
+-include("ucengine.hrl").
 
 -behaviour(gen_server).
 
