@@ -84,7 +84,7 @@ user_can(#rtmp_session{host = Host, user_id=[{meeting, Meeting}, {uid, Uid}]} = 
     StreamName = binary_to_list(Name),
     case Meeting of
         StreamName ->
-            case ucengine_client:can(Uid, "video", Right, [Meeting]) of
+            case ucengine_client:can(Uid, "video", Right, Meeting) of
                 true ->
                     ems_log:access(Host, "check acl video.~s ok (meeting: ~s, uid: ~s)", [Right, Meeting, Uid]),
                     unhandled;
