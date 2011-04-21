@@ -139,7 +139,7 @@ receive_events(State, Location, Type, Params, Pid) ->
         {_Pid, {error,req_timedout}} ->
             ok;
         Message ->
-            ems_log:error(default, "event not recognized ~p", [Message])
+            ems_log:debug("event not recognized ~p", [Message])
         after
             0 ->
                 ok
@@ -152,7 +152,7 @@ receive_events(State, Location, Type, Params, Pid) ->
                                {"_async", "lp"}]),
     NewParams = case Resp of
                     {ok, "200", _, Array} ->
-                        ems_log:error(default, "jsonevent ~p", [Array]),
+                        ems_log:debug("jsonevent ~p", [Array]),
                         Events = [decode_event(JSonEvent) || JSonEvent <- Array],
                         case Events of
                             [] ->
@@ -166,7 +166,7 @@ receive_events(State, Location, Type, Params, Pid) ->
                     {error,req_timedout} ->
                         Params;
                     Error ->
-                        ems_log:error(default, "Subscribe: error: ~p", [Error]),
+                        ems_log:error(default, "Subscribe:  ~p", [Error]),
                         timer:sleep(5000),
                         Params
                 end,
