@@ -26,7 +26,7 @@
 
 %% UCE PLUGIN API
 start() ->
-    application:start(ucengine),
+    application:start(erlyucengine),
     ok.
 
 stop() ->

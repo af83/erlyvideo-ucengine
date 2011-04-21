@@ -19,7 +19,7 @@
 %%% along with erlyvideo.  If not, see <http://www.gnu.org/licenses/>.
 %%%
 %%%---------------------------------------------------------------------------------------
--module(ucengine_app).
+-module(erlyucengine_app).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
 -behaviour(application).
 -version(1.0).
