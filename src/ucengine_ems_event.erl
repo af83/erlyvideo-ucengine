@@ -22,7 +22,7 @@
 -module(ucengine_ems_event).
 
 -include("ucengine.hrl").
--include("erlyvideo.hrl").
+-include("../../apps/erlyvideo/include/erlyvideo.hrl").
 
 -behaviour(gen_event).
 

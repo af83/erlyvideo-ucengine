@@ -31,11 +31,11 @@ And replace *trusted_login* by *ucengine_login* in *rtmp_handlers*, like that:
 
          # Fetch Erlyvideo sources
          $ git clone https://github.com/erlyvideo/erlyvideo.git
-         $ mkdir erlyvideo/plugins/
+         $ mkdir erlyvideo/plugins
          $ cd erlyvideo/plugins/
 
          # Fetch erlyvideo_ucengine sources
-         $ git clone git://github.com/AF83/erlyvideo-ucengine.git
+         $ git clone git://github.com/AF83/erlyvideo-ucengine.git erlyucengine
 
          # Build Erlyvideo
          $ cd ../../

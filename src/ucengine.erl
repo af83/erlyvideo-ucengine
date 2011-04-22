@@ -22,16 +22,13 @@
 -module(ucengine).
 -author('Thierry Bomandouki <thierry.bomandouki@af83.com>').
 
--export([start/0, stop/0, start_ucengine/0]).
+-export([start/0, stop/0]).
 
-%% UCE PLUGIN API
+%% Erlyvideo plugin API
 start() ->
     application:start(erlyucengine),
     ok.
 
 stop() ->
-    application:stop(ucengine),
-    application:unload(ucengine).
-
-start_ucengine() ->
-    ucengine_sup:start_ucengine().
+    application:stop(erlyucengine),
+    application:unload(erlyucengine).

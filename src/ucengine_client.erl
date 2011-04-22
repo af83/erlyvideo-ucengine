@@ -273,14 +273,8 @@ terminate(_Reason, _State) ->
 http_get(State, Path, Params) ->
     http_request(State, get, Path, Params).
 
-http_put(State, Path, Params) ->
-    http_request(State, put, Path, Params).
-
 http_post(State, Path, Params) ->
     http_request(State, post, Path, Params).
-
-http_delete(State, Path, Params) ->
-    http_request(State, delete, Path, Params).
 
 http_request(State, Method, Path, Params) ->
     Query = case Params of

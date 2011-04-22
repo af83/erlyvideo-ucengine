@@ -1,0 +1,8 @@
+{application, erlyucengine,
+[{description, "video ucengine"},
+ {vsn, git},
+ {modules, []},
+ {registered,[]},
+ {applications, [kernel,stdlib]},
+ {mod, {erlyucengine_app,[]}}
+]}.
