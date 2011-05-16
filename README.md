@@ -1,14 +1,31 @@
-# UCengine plugin for Erlyvideo
+# U.C.Engine plugin for Erlyvideo
 
 ## Introduction
 
-[erlyvideo_ucengine](https://github.com/AF83/erlyvideo-ucengine) is a plugin to bind Erlyvideo events and UCengine events, it allows UCengine clients to connect to Erlyvideo through UCengine events.
+[erlyvideo_ucengine](https://github.com/AF83/erlyvideo-ucengine) is a plugin to bind Erlyvideo events and U.C.Engine events, it allows U.C.Engine clients to connect to Erlyvideo through U.C.Engine events.
 
 ## Docs
 
 ### UCengine
 
-[docs.ucengine.org](http://docs.ucengine.org)
+[docs.ucengine.org/erlyvideo.html](http://docs.ucengine.org/erlyvideo.html)
+
+## Install it from scratch
+
+    # Fetch af83's fork of Erlyvideo
+    $ git clone https://github.com/AF83/erlyvideo.git --branch plugins
+    $ mkdir erlyvideo/plugins
+    $ cd erlyvideo/plugins/
+
+    # Fetch erlyvideo_ucengine sources
+    $ git clone git://github.com/AF83/erlyvideo-ucengine.git erlyucengine
+
+    # Build Erlyvideo
+    $ cd ../../
+    $ make
+
+    # Update configuration, then run Erlyvideo
+    $ make run
 
 ## Configuration
 
@@ -27,25 +44,8 @@ And replace *trusted_login* by *ucengine_login* in *rtmp_handlers*, like that:
 
         {rtmp_handlers, [{auth_users_limit, 200}, ucengine_login, apps_push, apps_streaming, apps_recording]},
 
-## Install it from scratch
-
-         # Fetch Erlyvideo sources
-         $ git clone https://github.com/erlyvideo/erlyvideo.git
-         $ mkdir erlyvideo/plugins
-         $ cd erlyvideo/plugins/
-
-         # Fetch erlyvideo_ucengine sources
-         $ git clone git://github.com/AF83/erlyvideo-ucengine.git erlyucengine
-
-         # Build Erlyvideo
-         $ cd ../../
-         $ make
-
-         # Update configuration, then run Erlyvideo
-         $ make run
-
 ## License
 
-Copyright 2010, af83
+Copyright 2010-2011, af83
 
 The default license for all files is GPLv3.
