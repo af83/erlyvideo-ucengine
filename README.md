@@ -6,7 +6,7 @@
 
 ## Docs
 
-### U.C.engine
+### U.C.Engine
 
 [docs.ucengine.org/erlyvideo.html](http://docs.ucengine.org/erlyvideo.html)
 
@@ -29,20 +29,26 @@
 
 ## Configuration
 
-Add the following lines to our erlyvideo.conf:
+Add the following lines to our *priv/erlyvideo.conf*:
 
-        {ucengine, [{host, "localhost"},
-            {port, 5280},
-            {uid, "erlyvideo"},
-            {token, "da93ae03c1280f82709f857ffa22f0a30c26fa9c"}]}.
+```erlang
+{ucengine, [{host, "localhost"},
+    {port, 5280},
+    {uid, "erlyvideo"},
+    {token, "da93ae03c1280f82709f857ffa22f0a30c26fa9c"}]}.
+```
 
 And don't forget to add 'ucengine' in our module list:
 
-        {modules, [ucengine]}.
+```erlang
+{modules, [ucengine]}.
+```
 
 And replace *trusted_login* by *ucengine_login* in *rtmp_handlers*, like that:
 
-        {rtmp_handlers, [{auth_users_limit, 200}, ucengine_login, apps_push, apps_streaming, apps_recording]},
+```erlang
+{rtmp_handlers, [{auth_users_limit, 200}, ucengine_login, apps_push, apps_streaming, apps_recording]},
+```
 
 ## License
 
