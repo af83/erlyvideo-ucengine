@@ -21,7 +21,7 @@
     $ git clone git://github.com/AF83/erlyvideo-ucengine.git erlyucengine
 
     # Build Erlyvideo
-    $ cd ../../
+    $ cd ../
     $ make
 
     # Update configuration, then run Erlyvideo
