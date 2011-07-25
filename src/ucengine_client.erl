@@ -145,11 +145,11 @@ receive_events(State, Location, Type, Params, Pid) ->
                 ok
     end,
 
-    Resp = http_get(State, "/event/" ++ Location,
+    Resp = http_get(State, "/live/" ++ Location,
                     Params ++ [{"uid", State#state.uid},
                                {"sid", State#state.sid},
                                {"type", Type},
-                               {"_async", "lp"}]),
+                               {"mode", "longpolling"}]),
     NewParams = case Resp of
                     {ok, "200", _, Array} ->
                         ems_log:debug("jsonevent ~p", [Array]),
